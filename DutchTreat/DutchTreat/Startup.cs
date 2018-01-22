@@ -27,6 +27,10 @@ namespace DutchTreat
             });
 
             services.AddTransient<IMailService, NullMailService>();
+
+            services.AddTransient<DutchSeeder>();
+
+            services.AddScoped<IDutchRepository, DutchRepository>();
             //support for real mail service
             services.AddMvc();
         }
@@ -51,6 +55,18 @@ namespace DutchTreat
                     "{controller}/{action}/{id?}", 
                     new { controller = "App", Action = "Index" });
             });
+
+            if (env.IsDevelopment())
+            {
+                // Seed the database
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var seeder = scope.ServiceProvider.GetService<DutchSeeder>();
+                    seeder.Seed();
+                }
+
+            }
+
 //
 //            app.Run(async (context) =>
 //            {
